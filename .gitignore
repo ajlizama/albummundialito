@@ -1,0 +1,23 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+.DS_Store
+.env*.local
+.env
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+Imagenes/
+
+# Archivos source pesados / referencias locales (no van al repo)
+*.pdf
+Sobre.jpeg
+# Fotos source del rebranding (ya están copiadas a public/brand/)
+/foto1.webp
+/foto2.svg.png
+/foto 3.svg.png
+# Datos source — los archivos generados (team-info.ts, stars.ts) sí van al repo
+Mundial_2026_48_Selecciones.xlsx
+contador_mundial_2026v2.xlsx

@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  background: #0E0327;
+  color: #fdf6e3;
+  min-height: 100%;
+}
+
+body {
+  /* Fondo oficial Mundial 2026: morado profundo con destellos del rojo y lima */
+  background-image:
+    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(91,23,235,0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 95% 10%, rgba(225,5,31,0.28) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 70% at 95% 100%, rgba(200,224,32,0.10) 0%, transparent 55%),
+    linear-gradient(180deg, #1D0A4A 0%, #0E0327 60%, #0A011D 100%);
+  background-attachment: fixed;
+}
+
+/* Tipografía display tipo mundial — fallback al system si no carga */
+@font-face {
+  font-family: "MundialDisplay";
+  src: local("Bebas Neue"), local("Anton"), local("Oswald"), local("Impact");
+  font-display: swap;
+}
+
+.font-mundial {
+  font-family: "MundialDisplay", "Bebas Neue", "Anton", "Oswald", system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* Sticker tile estilo Panini — bordes irregulares 2026 */
+.sticker-blob {
+  clip-path: polygon(
+    8% 0%, 88% 0%, 95% 6%, 100% 16%, 100% 70%, 95% 88%,
+    88% 96%, 60% 100%, 12% 100%, 4% 92%, 0% 78%, 0% 18%
+  );
+}
+
+.sticker-have {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,245,0.92) 100%);
+  color: #1a1a1a;
+  box-shadow:
+    inset 0 -3px 0 rgba(0,0,0,0.08),
+    0 2px 8px rgba(0,0,0,0.25);
+}
+
+.sticker-missing {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.4);
+  border: 2px dashed rgba(255,255,255,0.15);
+}
+
+.sticker-duplicate {
+  background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+  color: #1a1a1a;
+  box-shadow:
+    0 0 0 2px rgba(255,215,0,0.5),
+    0 4px 12px rgba(255,215,0,0.3);
+}
+
+/* botones */
+.btn-primary {
+  background: linear-gradient(135deg, #E1051F 0%, #5B17EB 100%);
+  color: white;
+  font-weight: 700;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  box-shadow: 0 4px 14px rgba(225,5,31,0.4), 0 0 0 1px rgba(255,215,0,0.15);
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(225,5,31,0.55), 0 0 0 1px rgba(255,215,0,0.3);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-weight: 600;
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.14);
+}
+
+.input {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: white;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 120ms ease;
+  width: 100%;
+}
+.input:focus {
+  border-color: #5B17EB;
+  box-shadow: 0 0 0 3px rgba(91,23,235,0.25);
+}
+.input::placeholder {
+  color: rgba(255,255,255,0.4);
+}
+
+.label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.65);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  display: block;
+}
+
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px;
+  backdrop-filter: blur(8px);
+}
