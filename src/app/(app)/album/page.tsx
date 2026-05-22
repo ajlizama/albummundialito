@@ -75,21 +75,38 @@ export default async function AlbumPage() {
           />
         </div>
 
-        <Link
-          href="/album/sobre"
-          className="mt-5 flex items-center justify-between gap-4 rounded-2xl p-4 bg-gradient-to-r from-mundial-red/30 via-mundial-purple/30 to-mundial-lime/20 border border-mundial-gold/50 hover:border-mundial-gold transition group"
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">📸</span>
-            <div>
-              <div className="font-mundial text-xl leading-none">Cargar sobre</div>
-              <div className="text-xs text-white/80 mt-1">
-                Sacá una foto al dorso de las 7 láminas y las cargamos solas
+        <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Link
+            href="/album/sobre"
+            className="flex items-center justify-between gap-4 rounded-2xl p-4 bg-gradient-to-r from-mundial-red/30 via-mundial-purple/30 to-mundial-lime/20 border border-mundial-gold/50 hover:border-mundial-gold transition group"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">📸</span>
+              <div>
+                <div className="font-mundial text-lg leading-none">Cargar sobre</div>
+                <div className="text-xs text-white/80 mt-1">
+                  Foto al dorso de las 7 láminas
+                </div>
               </div>
             </div>
-          </div>
-          <span className="text-2xl group-hover:translate-x-1 transition shrink-0">→</span>
-        </Link>
+            <span className="text-2xl group-hover:translate-x-1 transition shrink-0">→</span>
+          </Link>
+          <Link
+            href="/album/cargar"
+            className="flex items-center justify-between gap-4 rounded-2xl p-4 bg-gradient-to-r from-mundial-purple/30 via-mundial-lime/20 to-mundial-red/20 border border-mundial-lime/50 hover:border-mundial-lime transition group"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">📋</span>
+              <div>
+                <div className="font-mundial text-lg leading-none">Importar lista</div>
+                <div className="text-xs text-white/80 mt-1">
+                  Pegá el export de Figuritas y carga todo
+                </div>
+              </div>
+            </div>
+            <span className="text-2xl group-hover:translate-x-1 transition shrink-0">→</span>
+          </Link>
+        </div>
         </div>
       </section>
 
