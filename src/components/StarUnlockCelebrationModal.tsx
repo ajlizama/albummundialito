@@ -53,6 +53,15 @@ function buildConfetti(colors: [string, string, string]): ConfettiPiece[] {
 export function StarUnlockCelebrationModal({ celebration, onClose }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // `onClose` típicamente llega como una arrow inline desde el padre, lo que
+  // hace que su referencia cambie en cada render. Lo guardamos en una ref
+  // para poder usarlo dentro del useEffect sin que el effect se re-ejecute
+  // y pause/reanude el audio cada vez que el padre re-renderea.
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   // El confetti se genera una sola vez por celebración para que los valores
   // random no cambien en cada render.
   const confetti = useMemo<ConfettiPiece[]>(
@@ -66,50 +75,31 @@ export function StarUnlockCelebrationModal({ celebration, onClose }: Props) {
   useEffect(() => {
     if (!celebration) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     };
     document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    const startAt = celebration.audioStartSec ?? 0;
-    const audio = audioRef.current;
-    if (audio) {
-      // Si los metadatos ya cargaron podemos setear currentTime de una; si no,
-      // esperamos a `loadedmetadata` porque setear currentTime antes lanza un
-      // InvalidStateError en algunos navegadores.
-      const seekAndPlay = () => {
-        try {
-          audio.currentTime = startAt;
-        } catch {
-          /* no-op */
-        }
-        audio.play().catch(() => {
-          // Algunos navegadores bloquean si no hubo gesto reciente del usuario.
-        });
-      };
-      if (audio.readyState >= 1) {
-        seekAndPlay();
-      } else {
-        audio.addEventListener("loadedmetadata", seekAndPlay, { once: true });
-      }
-    }
-
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
-      if (audioRef.current) {
-        audioRef.current.pause();
-        try {
-          audioRef.current.currentTime = startAt;
-        } catch {
-          /* no-op */
-        }
-      }
+      // Al cerrar el modal pausamos el audio. No reseteamos currentTime porque
+      // el <audio> ya se desmonta cuando celebration vuelve a null.
+      if (audioRef.current) audioRef.current.pause();
     };
-  }, [celebration, onClose]);
+  }, [celebration]); // ← sólo depende de celebration, no de onClose
 
   if (!celebration) return null;
+
+  // Usamos un HTML media fragment (#t=N) para que el navegador arranque
+  // nativamente desde audioStartSec sin race entre seek y play.
+  // Compatible con Safari/Chrome/Firefox/Edge modernos.
+  const startAt = celebration.audioStartSec ?? 0;
+  const audioSrc =
+    startAt > 0
+      ? `${celebration.audioUrl}#t=${startAt}`
+      : celebration.audioUrl;
 
   return (
     <div
@@ -119,9 +109,9 @@ export function StarUnlockCelebrationModal({ celebration, onClose }: Props) {
       aria-modal="true"
       aria-label={celebration.title}
     >
-      {/* Audio — sin autoPlay; el useEffect hace seek a audioStartSec y luego play(),
-          así evitamos escuchar el offset 0 por un instante antes del seek. */}
-      <audio ref={audioRef} src={celebration.audioUrl} preload="auto" />
+      {/* Audio — autoPlay con media fragment (#t=N) garantiza arranque inmediato
+          desde audioStartSec sin race entre seek/play. Solo suena una vez. */}
+      <audio ref={audioRef} src={audioSrc} autoPlay preload="auto" />
 
       {/* Glow radial dorado de fondo */}
       <div
