@@ -51,27 +51,27 @@ export function BulkImportForm() {
     <div className="space-y-6">
       {/* Textarea */}
       <div>
-        <label className="label">Pegá el texto del export de Figuritas</label>
+        <label className="label">Pega el texto del export de Figuritas</label>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={14}
           spellCheck={false}
-          placeholder={`Figuritas App - Lista
-Usa Méx Can 26
+          placeholder={`Figuritas App - List
+Usa Mex Can 26
 
-Me faltan
+I need
 FWC 🏆: 2, 3, 4
 MEX 🇲🇽: 1, 9, 13, 14
 ...
 
-Repetidas
+Swaps
 MEX 🇲🇽: 8, 12
 ...`}
           className="input font-mono text-xs sm:text-sm w-full min-h-[280px] resize-y"
         />
         <p className="text-xs text-white/50 mt-1">
-          Pegá tal cual el texto que te da la app Figuritas. El parser ignora
+          Pega tal cual el texto que te da la app Figuritas. El parser ignora
           emojis, líneas vacías, headers y promos (ej. <code>CC 🥤</code>).
         </p>
       </div>
@@ -173,7 +173,7 @@ MEX 🇲🇽: 8, 12
             ? "Aplicando…"
             : plan
               ? `Aplicar (${plan.totalHave} pegadas)`
-              : "Pegá el texto arriba"}
+              : "Pega el texto arriba"}
         </button>
         <button
           type="button"

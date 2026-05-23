@@ -39,6 +39,7 @@ const TIER_2: StarIn[] = [
   { name: "Raphinha", teamCode: "BRA" },
   { name: "Vitinha", teamCode: "POR" },
   { name: "Lautaro Martínez", teamCode: "ARG" },
+  { name: "Michael Olise", teamCode: "FRA" },
 ];
 
 const TIER_3: StarIn[] = [

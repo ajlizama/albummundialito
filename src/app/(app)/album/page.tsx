@@ -100,7 +100,7 @@ export default async function AlbumPage() {
               <div>
                 <div className="font-mundial text-lg leading-none">Importar lista</div>
                 <div className="text-xs text-white/80 mt-1">
-                  Pegá el export de Figuritas y carga todo
+                  Pega el export de Figuritas y carga todo
                 </div>
               </div>
             </div>

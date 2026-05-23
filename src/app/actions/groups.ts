@@ -78,7 +78,7 @@ export async function inviteToGroupByUsername(
     .ilike("username", username)
     .maybeSingle();
   if (!target) return { ok: false, error: "Usuario no encontrado" };
-  if (target.id === userId) return { ok: false, error: "Ya sos miembro del grupo" };
+  if (target.id === userId) return { ok: false, error: "Ya eres miembro del grupo" };
 
   // ¿Ya existe membership?
   const { data: existing } = await supabase

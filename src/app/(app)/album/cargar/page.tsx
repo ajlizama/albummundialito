@@ -31,7 +31,7 @@ export default function CargarPage() {
             >
               figuritas.app
             </a>
-            , exportá tu lista de "Me faltan / Repetidas" y pegala acá. Cargamos
+            , exporta tu lista de "Me faltan / Repetidas" y pégala aquí. Cargamos
             todo de un saque.
           </p>
         </div>
@@ -66,8 +66,8 @@ RSA 🇿🇦: 1, 5, 19
             colección).
           </li>
           <li>
-            "Repetidas" → marca esas láminas con count = 2 (asumimos 2; podés
-            ajustar manualmente después si tenés más).
+            "Repetidas" → marca esas láminas con count = 2 (asumimos 2; puedes
+            ajustar manualmente después si tienes más).
           </li>
           <li>
             Códigos que no estén en este álbum (ej. <code>CC 🥤</code> de Coca-Cola)

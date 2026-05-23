@@ -41,25 +41,22 @@ export default async function TradesPage() {
     f.requester_id === me!.id ? f.addressee_id : f.requester_id
   );
 
-  // Todas las colecciones de amigos en una sola query
-  const { data: friendColl } =
-    friendIds.length > 0
-      ? await supabase
-          .from("collection")
-          .select("user_id, sticker_id, count")
-          .in("user_id", friendIds)
-      : { data: [] as { user_id: string; sticker_id: string; count: number }[] };
-
-  // Build: por amigo, mapa de sus counts
+  // Colecciones de los amigos: una query por amigo en paralelo.
+  // Antes era `.in("user_id", friendIds)` en una sola query, pero PostgREST
+  // cap-ea a 1000 filas por respuesta y con varios amigos completaditos las
+  // filas de los últimos quedaban truncadas → matches fantasma.
   const byFriend = new Map<string, Map<string, number>>();
-  friendColl?.forEach((r) => {
-    let m = byFriend.get(r.user_id);
-    if (!m) {
-      m = new Map();
-      byFriend.set(r.user_id, m);
-    }
-    m.set(r.sticker_id, r.count);
-  });
+  await Promise.all(
+    friendIds.map(async (friendId) => {
+      const { data } = await supabase
+        .from("collection")
+        .select("sticker_id, count")
+        .eq("user_id", friendId);
+      const m = new Map<string, number>();
+      data?.forEach((r) => m.set(r.sticker_id, r.count));
+      byFriend.set(friendId, m);
+    })
+  );
 
   // Computar matches por amigo
   const cards = accepted.map((f) => {

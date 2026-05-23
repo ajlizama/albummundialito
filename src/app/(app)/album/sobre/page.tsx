@@ -18,7 +18,7 @@ export default function CargarSobrePage() {
           <p className="text-mundial-gold uppercase text-xs tracking-widest font-semibold">Nuevo</p>
           <h1 className="font-mundial text-4xl sm:text-5xl mt-1 leading-none">CARGAR SOBRE</h1>
           <p className="text-white/70 mt-3 max-w-2xl">
-            Sacá una foto al dorso de las láminas de tu sobre y dejá que Claude las identifique automáticamente.
+            Saca una foto al dorso de las láminas de tu sobre y deja que Claude las identifique automáticamente.
             Se suman a tu álbum y te decimos cuáles son nuevas y cuáles ya tenías.
           </p>
         </div>
@@ -40,19 +40,19 @@ function Guide() {
       <ol className="space-y-4">
         <Step
           n={1}
-          title="Acomodá las láminas del sobre por el DORSO"
-          body="Poné las 7 láminas boca abajo sobre una mesa, sin solapar, en cualquier orden. El dorso es el lado gris/blanco con el logo de Panini y FIFA."
+          title="Acomoda las láminas del sobre por el DORSO"
+          body="Pon las 7 láminas boca abajo sobre una mesa, sin solapar, en cualquier orden. El dorso es el lado gris/blanco con el logo de Panini y FIFA."
         />
         <Step
           n={2}
-          title="Sacá UNA foto con todas visibles"
-          body="Aseguráte de que el código de la esquina superior derecha de cada lámina (ej. SUI 13, TUR 20, FWC 7) se lea claramente. Buena luz, sin sombras encima, lo más perpendicular posible."
-          hint="Si tenés más de un sobre para cargar, usá el selector de abajo y sacá una foto por sobre."
+          title="Toma UNA foto con todas visibles"
+          body="Asegúrate de que el código de la esquina superior derecha de cada lámina (ej. SUI 13, TUR 20, FWC 7) se lea claramente. Buena luz, sin sombras encima, lo más perpendicular posible."
+          hint="Si tienes más de un sobre para cargar, usa el selector de abajo y toma una foto por sobre."
         />
         <Step
           n={3}
           title="Procesar y revisar"
-          body="Tocá Procesar. Te mostramos las láminas detectadas, cuáles eran nuevas (🆕) y cuáles ya tenías repetidas (✨ ×2, 🔁 ×3…). Todo queda guardado en tu álbum al instante."
+          body="Pulsa Procesar. Te mostramos las láminas detectadas, cuáles eran nuevas (🆕) y cuáles ya tenías repetidas (✨ ×2, 🔁 ×3…). Todo queda guardado en tu álbum al instante."
         />
       </ol>
 
@@ -73,7 +73,7 @@ function Guide() {
             Esa lámina NO se carga al álbum.
           </p>
           <p>
-            Solución: cargá ese sobre de nuevo solo con esa lámina, o marcala manualmente
+            Solución: carga ese sobre de nuevo solo con esa lámina, o márcala manualmente
             entrando al equipo desde el álbum.
           </p>
         </div>

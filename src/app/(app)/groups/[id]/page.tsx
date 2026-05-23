@@ -61,19 +61,22 @@ export default async function GroupDetailPage({
   const members = (rawMembers as unknown as RawMember[]) ?? [];
   const memberIds = members.map((m) => m.user_id);
 
-  // Colecciones de todos los miembros (en una query)
-  const { data: allColl } =
-    memberIds.length > 0
-      ? await supabase
-          .from("collection")
-          .select("user_id, sticker_id, count")
-          .in("user_id", memberIds)
-      : { data: [] as { user_id: string; sticker_id: string; count: number }[] };
-
-  // Index counts[userId][stickerId]
+  // Colecciones de todos los miembros: una query por miembro en paralelo.
+  // Antes era `.in("user_id", memberIds)` en una sola query, pero PostgREST
+  // cap-ea a 1000 filas por respuesta — con grupos grandes las filas de los
+  // últimos miembros quedaban truncadas y aparecían con 0 láminas.
   const counts = new Map<string, Map<string, number>>();
   for (const mid of memberIds) counts.set(mid, new Map());
-  allColl?.forEach((r) => counts.get(r.user_id)!.set(r.sticker_id, r.count));
+  await Promise.all(
+    memberIds.map(async (memberId) => {
+      const { data } = await supabase
+        .from("collection")
+        .select("sticker_id, count")
+        .eq("user_id", memberId);
+      const m = counts.get(memberId)!;
+      data?.forEach((r) => m.set(r.sticker_id, r.count));
+    })
+  );
 
   // Per-member stats
   const stats = members.map((m) => {
@@ -293,11 +296,11 @@ export default async function GroupDetailPage({
       <section>
         <h2 className="font-mundial text-2xl mb-1">🔁 Matches de intercambio</h2>
         <p className="text-sm text-white/60 mb-3">
-          Lo que cada miembro te puede dar (tiene repetida y vos no la tenés) y viceversa.
+          Lo que cada miembro te puede dar (tiene repetida y tú no la tienes) y viceversa.
         </p>
         {trades.length === 0 ? (
           <div className="card p-6 text-center text-white/60 text-sm">
-            Sos el único miembro del grupo. Invitá amigos para empezar a intercambiar.
+            Eres el único miembro del grupo. Invita amigos para empezar a intercambiar.
           </div>
         ) : (
           <div className="space-y-3">
@@ -325,7 +328,7 @@ export default async function GroupDetailPage({
                       </span>
                       <span>
                         <span className="text-mundial-gold font-bold">{t.forThem.length}</span>{" "}
-                        <span className="text-white/60">le podés dar</span>
+                        <span className="text-white/60">le puedes dar</span>
                       </span>
                       {mutual && (
                         <span className="px-2 py-1 rounded-full bg-mundial-gold text-black text-xs font-bold">

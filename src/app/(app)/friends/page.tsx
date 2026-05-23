@@ -39,23 +39,25 @@ export default async function FriendsPage() {
   );
   const accepted = all.filter((f) => f.status === "accepted");
 
-  // Conteos de coleccion de los amigos
+  // Conteo de pegadas de cada amigo. Hacemos una query por amigo (en paralelo)
+  // y usamos `head: true` para que la DB devuelva solo el count agregado, sin
+  // traer filas. Antes hacíamos `.in("user_id", friendIds)` y contábamos en
+  // memoria, pero PostgREST cap-ea a 1000 filas por respuesta, así que con
+  // varios amigos completaditos los últimos quedaban en 0.
   const friendIds = accepted.map((f) =>
     f.requester_id === user!.id ? f.addressee_id : f.requester_id
   );
-  const { data: counts } =
-    friendIds.length > 0
-      ? await supabase
-          .from("collection")
-          .select("user_id, count")
-          .in("user_id", friendIds)
-      : { data: [] as { user_id: string; count: number }[] };
-
   const havesByUser = new Map<string, number>();
-  counts?.forEach((r) => {
-    if (r.count >= 1)
-      havesByUser.set(r.user_id, (havesByUser.get(r.user_id) || 0) + 1);
-  });
+  await Promise.all(
+    friendIds.map(async (friendId) => {
+      const { count } = await supabase
+        .from("collection")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", friendId)
+        .gte("count", 1);
+      if (count != null) havesByUser.set(friendId, count);
+    })
+  );
 
   return (
     <div className="space-y-8">

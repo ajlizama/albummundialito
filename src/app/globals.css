@@ -10,6 +10,9 @@ html, body {
   background: #0E0327;
   color: #fdf6e3;
   min-height: 100%;
+  /* Safety net: si algún hijo se desborda lateralmente, no debe permitir scroll
+     horizontal del documento (en móvil se percibe como que la pantalla "baila"). */
+  overflow-x: clip;
 }
 
 body {

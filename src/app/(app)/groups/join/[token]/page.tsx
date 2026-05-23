@@ -45,7 +45,7 @@ export default async function JoinGroupPage({
       <div className="card p-8 text-center space-y-4 max-w-md mx-auto">
         <h1 className="font-mundial text-2xl">¿Quieres unirte a un grupo?</h1>
         <p className="text-white/70">
-          No tenemos info previa de este grupo en tu cuenta. Tocá el botón para validar el link e
+          No tenemos info previa de este grupo en tu cuenta. Pulsa el botón para validar el link e
           ingresar.
         </p>
         <JoinGroupButton token={token} label="Unirme al grupo" />
@@ -67,7 +67,7 @@ export default async function JoinGroupPage({
   if (existing?.status === "accepted") {
     return (
       <div className="card p-8 text-center space-y-4 max-w-md mx-auto">
-        <h1 className="font-mundial text-2xl">Ya sos miembro</h1>
+        <h1 className="font-mundial text-2xl">Ya eres miembro</h1>
         <p className="text-white/70">Estás en <strong>{group.name}</strong>.</p>
         <Link href={`/groups/${group.id}`} className="btn-primary inline-block">
           Ir al grupo
@@ -86,7 +86,7 @@ export default async function JoinGroupPage({
         <p className="text-white/70">{group.description}</p>
       )}
       <p className="text-sm text-white/60">
-        Al unirte, los demás miembros podrán ver tu colección (qué tenés, qué te falta y tus repetidas)
+        Al unirte, los demás miembros podrán ver tu colección (qué tienes, qué te falta y tus repetidas)
         para encontrar matches de intercambio.
       </p>
       <JoinGroupButton token={token} label={`Unirme a ${group.name}`} />

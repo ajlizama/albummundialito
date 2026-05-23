@@ -105,27 +105,49 @@ create policy "collection_modify_own" on public.collection
 
 
 -- ----------- 4) trigger: al crear un user, crear su profile -----------
+-- El handle público (@username) se deriva del display_name que el usuario eligió
+-- en signup — NO del email — para no filtrar el correo. Si no hay display_name,
+-- se usa un fallback genérico "usuario". El display_name se guarda tal cual.
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer set search_path = public
 as $$
 declare
+  raw_name text;
+  display text;
   base_username text;
   candidate text;
   i int := 0;
 begin
-  base_username := regexp_replace(split_part(new.email, '@', 1), '[^a-zA-Z0-9_]', '_', 'g');
+  raw_name := coalesce(nullif(trim(new.raw_user_meta_data->>'display_name'), ''), '');
+  display := case when raw_name = '' then 'Usuario' else raw_name end;
+
+  -- Slug del display_name: minúsculas, sin acentos, solo a-z0-9_.
+  -- Si queda vacío (p.ej. nombre sólo con caracteres no ASCII), fallback "usuario".
+  base_username := lower(raw_name);
+  base_username := translate(base_username,
+    'áàäâãåéèëêíìïîóòöôõúùüûñçÁÀÄÂÃÅÉÈËÊÍÌÏÎÓÒÖÔÕÚÙÜÛÑÇ',
+    'aaaaaaeeeeiiiiooooouuuuncAAAAAAEEEEIIIIOOOOOUUUUNC');
+  base_username := regexp_replace(base_username, '[^a-z0-9_]+', '_', 'g');
+  base_username := regexp_replace(base_username, '^_+|_+$', '', 'g');
   if base_username = '' or base_username is null then
-    base_username := 'user';
+    base_username := 'usuario';
   end if;
+  if length(base_username) < 3 then
+    base_username := base_username || '_user';
+  end if;
+  if length(base_username) > 20 then
+    base_username := substring(base_username from 1 for 20);
+  end if;
+
   candidate := base_username;
   while exists(select 1 from public.profiles where username = candidate) loop
     i := i + 1;
     candidate := base_username || i;
   end loop;
   insert into public.profiles (id, username, display_name)
-  values (new.id, candidate, coalesce(new.raw_user_meta_data->>'display_name', candidate));
+  values (new.id, candidate, display);
   return new;
 end;
 $$;

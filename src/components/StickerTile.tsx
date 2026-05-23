@@ -8,6 +8,8 @@ import {
   decrementDuplicate,
 } from "@/app/actions/collection";
 import { PlayerInfoModal } from "./PlayerInfoModal";
+import { getStarVideo, type StarVideo } from "@/lib/data/star-videos";
+import { StarUnlockVideoModal } from "./StarUnlockVideoModal";
 
 interface Props {
   sticker: Sticker;
@@ -23,6 +25,7 @@ export function StickerTile({ sticker, count, teamColors, teamNameEs, flagCode }
   const [pending, startTransition] = useTransition();
   const [infoOpen, setInfoOpen] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
+  const [unlockedVideo, setUnlockedVideo] = useState<StarVideo | null>(null);
 
   const hasWikiTarget = sticker.kind === "player" && Boolean(sticker.name);
   const photoUrl = `/stickers/${sticker.id}.jpg`;
@@ -31,8 +34,17 @@ export function StickerTile({ sticker, count, teamColors, teamNameEs, flagCode }
     optimisticCount === 0 ? "missing" : optimisticCount === 1 ? "have" : "duplicate";
 
   function onMainClick() {
+    const wasMissing = optimisticCount === 0;
     const next = optimisticCount === 0 ? 1 : optimisticCount - 1;
     setOptimistic(next);
+    // Si esta es una pegada nueva (0 → 1) y el sticker tiene video de
+    // estrella asociado, abrimos el modal. Lo hacemos en el render (no en
+    // el callback de la transición) para aprovechar que el click del usuario
+    // está fresco y los navegadores permiten autoplay con sonido.
+    if (wasMissing) {
+      const v = getStarVideo(sticker.id);
+      if (v) setUnlockedVideo(v);
+    }
     startTransition(async () => {
       try {
         await toggleHave(sticker.id, optimisticCount);
@@ -199,6 +211,11 @@ export function StickerTile({ sticker, count, teamColors, teamNameEs, flagCode }
           flagCode={flagCode}
         />
       )}
+
+      <StarUnlockVideoModal
+        video={unlockedVideo}
+        onClose={() => setUnlockedVideo(null)}
+      />
     </div>
   );
 }

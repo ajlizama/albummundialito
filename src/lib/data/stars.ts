@@ -142,6 +142,13 @@ export const STAR_TIERS: StarTier[] = [
             "stickerId": "ARG-18",
             "wikiUrl": "https://en.wikipedia.org/wiki/Lautaro_Mart%C3%ADnez",
             "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Lautaro_Martinez_ARGENTINA_VS_VENEZUELA_2017.jpg/330px-Lautaro_Martinez_ARGENTINA_VS_VENEZUELA_2017.jpg"
+        },
+        {
+            "name": "Michael Olise",
+            "teamCode": "FRA",
+            "stickerId": "FRA-14",
+            "wikiUrl": "https://es.wikipedia.org/wiki/Michael_Olise",
+            "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/FC_RB_Salzburg_gegen_FC_Bayern_M%C3%BCnchen_%282026-01-06_Testspiel%29_10.jpg/330px-FC_RB_Salzburg_gegen_FC_Bayern_M%C3%BCnchen_%282026-01-06_Testspiel%29_10.jpg"
         }
     ],
   },

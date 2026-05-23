@@ -102,7 +102,7 @@ export default async function GroupsPage() {
         </h2>
         {accepted.length === 0 ? (
           <div className="card p-6 text-center text-white/60 text-sm">
-            Todavía no tenés ningún grupo. Creá uno arriba o pedile a un amigo que te invite.
+            Todavía no tienes ningún grupo. Crea uno arriba o pídele a un amigo que te invite.
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">

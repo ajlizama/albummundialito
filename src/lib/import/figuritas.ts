@@ -1,8 +1,8 @@
 // Parser del formato de export de la app "Figuritas" (figuritas.app).
 //
-// El formato tiene 2 secciones:
-//   "Me faltan"  → líneas tipo "MEX 🇲🇽: 1, 9, 13"   (números que faltan)
-//   "Repetidas"  → líneas tipo "MEX 🇲🇽: 8, 12"      (números repetidos)
+// El formato tiene 2 secciones. La app exporta en español o en inglés:
+//   "Me faltan" / "I need"   → líneas tipo "MEX 🇲🇽: 1, 9, 13"  (números que faltan)
+//   "Repetidas" / "Swaps"    → líneas tipo "MEX 🇲🇽: 8, 12"     (números repetidos)
 //
 // Cualquier número que NO aparezca en ninguna lista de un equipo → el usuario
 // lo tiene exactamente una vez.
@@ -67,15 +67,25 @@ function stickerId(code: string, number: number): string | null {
 
 /** Detecta el header de sección. Tolerante a mayúsculas/espacios/idioma. */
 function detectSection(line: string): "missing" | "duplicates" | null {
-  const t = line.trim().toLowerCase();
+  // Normalizamos: minúsculas, sin ":" final, sin espacios extra.
+  const t = line.trim().toLowerCase().replace(/[:：]\s*$/, "").trim();
   if (!t) return null;
-  if (t === "me faltan" || t === "faltan" || t === "missing" || t === "me faltan:")
+  if (
+    t === "me faltan" ||
+    t === "faltan" ||
+    t === "missing" ||
+    t === "i need" ||
+    t === "need"
+  )
     return "missing";
   if (
     t === "repetidas" ||
-    t === "repetidas:" ||
     t === "duplicates" ||
-    t === "duplicadas"
+    t === "duplicadas" ||
+    t === "swaps" ||
+    t === "swap" ||
+    t === "intercambios" ||
+    t === "para cambiar"
   )
     return "duplicates";
   return null;
@@ -198,6 +208,13 @@ export function parseFiguritas(text: string): {
 export function buildImportPlan(text: string): BulkImportPlan {
   const { missing, duplicates, report } = parseFiguritas(text);
   const mentionedCodes = new Set(report.parsedTeams);
+
+  // Si no se reconoció ninguna sección (headers en otro idioma/formato),
+  // no asumimos que el álbum está completo: devolvemos un plan vacío para
+  // que la UI deshabilite el botón en vez de marcar todo como pegado.
+  if (report.parsedTeams.length === 0) {
+    return { upserts: [], deletes: [], report, totalHave: 0, totalDup: 0 };
+  }
 
   const upserts: { sticker_id: string; count: number }[] = [];
   const deletes: string[] = [];

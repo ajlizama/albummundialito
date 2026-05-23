@@ -82,7 +82,7 @@ export function GroupAdminTools({
       {/* Link compartible */}
       <div>
         <div className="text-xs uppercase tracking-wider text-white/55 font-semibold mb-1.5">
-          O compartí este link
+          O comparte este link
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <input

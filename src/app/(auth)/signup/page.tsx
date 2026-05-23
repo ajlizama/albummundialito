@@ -28,12 +28,20 @@ export default function SignupPage() {
     setError(null);
     setInfo(null);
     setLoading(true);
+    const cleanName = displayName.trim();
+    if (cleanName.length < 2) {
+      setError("Escribe un nombre para mostrar (mínimo 2 caracteres).");
+      setLoading(false);
+      return;
+    }
     const supabase = createClient();
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { display_name: displayName || email.split("@")[0] },
+        // El handle público @username se deriva de este nombre en el trigger
+        // handle_new_user — no se filtra la parte local del email.
+        data: { display_name: cleanName },
       },
     });
     if (error) {
@@ -67,11 +75,17 @@ export default function SignupPage() {
           <input
             id="display_name"
             type="text"
+            required
+            minLength={2}
+            maxLength={40}
             className="input"
-            placeholder="Tu nombre o apodo"
+            placeholder="Tu nombre o apodo (será tu @handle)"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
           />
+          <p className="text-xs text-white/40 mt-1">
+            Tu @handle público se genera de este nombre. No usamos tu correo.
+          </p>
         </div>
         <div>
           <label className="label" htmlFor="email">Email</label>

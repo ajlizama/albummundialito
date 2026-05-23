@@ -18,9 +18,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-30 backdrop-blur-md bg-mundial-ink/75 border-b-2 border-mundial-purple/40">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-          <Link href="/album" className="font-mundial text-xl sm:text-2xl flex items-center gap-2.5">
-            <span className="inline-flex items-center justify-center bg-white rounded-md px-1.5 py-1 shadow-[0_2px_8px_rgba(91,23,235,0.45)]">
+        <nav className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-2 sm:gap-4">
+          <Link
+            href="/album"
+            className="font-mundial text-xl sm:text-2xl flex items-center gap-2.5 shrink-0 min-w-0"
+          >
+            <span className="inline-flex items-center justify-center bg-white rounded-md px-1.5 py-1 shadow-[0_2px_8px_rgba(91,23,235,0.45)] shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/brand/logo-26.png"
@@ -31,11 +34,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               />
             </span>
             <span className="hidden sm:inline">ÁLBUM MUNDIALITO</span>
-            <span className="sm:hidden">MUNDIALITO</span>
           </Link>
 
-          <div className="flex items-center gap-1 sm:gap-2 text-sm">
-            <Link href="/album" className="px-3 py-1.5 rounded-full hover:bg-white/10 transition">
+          <div className="flex items-center gap-1 sm:gap-2 text-sm min-w-0">
+            <Link
+              href="/album"
+              className="px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-white/10 transition shrink-0"
+            >
               Álbum
             </Link>
             <Link
@@ -45,10 +50,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <span>📸</span>
               <span>Sobre</span>
             </Link>
-            <Link href="/friends" className="px-3 py-1.5 rounded-full hover:bg-white/10 transition">
+            <Link
+              href="/friends"
+              className="px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-white/10 transition shrink-0"
+            >
               Amigos
             </Link>
-            <Link href="/groups" className="px-3 py-1.5 rounded-full hover:bg-white/10 transition">
+            <Link
+              href="/groups"
+              className="px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-white/10 transition shrink-0"
+            >
               Grupos
             </Link>
             <Link href="/trades" className="px-3 py-1.5 rounded-full hover:bg-white/10 transition hidden sm:inline">
@@ -56,7 +67,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </Link>
             <Link
               href="/profile"
-              className="ml-1 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 transition font-semibold"
+              className="ml-0.5 sm:ml-1 px-2.5 sm:px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 transition font-semibold max-w-[9rem] sm:max-w-none truncate"
             >
               @{profile?.username || "tu perfil"}
             </Link>
