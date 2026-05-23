@@ -71,16 +71,40 @@ export function StarUnlockCelebrationModal({ celebration, onClose }: Props) {
     document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    // Forzar play en navegadores donde el atributo autoPlay no basta.
-    audioRef.current?.play().catch(() => {
-      // Ignorar — algunos navegadores bloquean si no hubo gesto reciente.
-    });
+
+    const startAt = celebration.audioStartSec ?? 0;
+    const audio = audioRef.current;
+    if (audio) {
+      // Si los metadatos ya cargaron podemos setear currentTime de una; si no,
+      // esperamos a `loadedmetadata` porque setear currentTime antes lanza un
+      // InvalidStateError en algunos navegadores.
+      const seekAndPlay = () => {
+        try {
+          audio.currentTime = startAt;
+        } catch {
+          /* no-op */
+        }
+        audio.play().catch(() => {
+          // Algunos navegadores bloquean si no hubo gesto reciente del usuario.
+        });
+      };
+      if (audio.readyState >= 1) {
+        seekAndPlay();
+      } else {
+        audio.addEventListener("loadedmetadata", seekAndPlay, { once: true });
+      }
+    }
+
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
       if (audioRef.current) {
         audioRef.current.pause();
-        audioRef.current.currentTime = 0;
+        try {
+          audioRef.current.currentTime = startAt;
+        } catch {
+          /* no-op */
+        }
       }
     };
   }, [celebration, onClose]);
@@ -95,13 +119,9 @@ export function StarUnlockCelebrationModal({ celebration, onClose }: Props) {
       aria-modal="true"
       aria-label={celebration.title}
     >
-      {/* Audio */}
-      <audio
-        ref={audioRef}
-        src={celebration.audioUrl}
-        autoPlay
-        preload="auto"
-      />
+      {/* Audio — sin autoPlay; el useEffect hace seek a audioStartSec y luego play(),
+          así evitamos escuchar el offset 0 por un instante antes del seek. */}
+      <audio ref={audioRef} src={celebration.audioUrl} preload="auto" />
 
       {/* Glow radial dorado de fondo */}
       <div

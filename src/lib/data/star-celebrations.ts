@@ -12,6 +12,11 @@ export interface StarCelebration {
   imageUrl: string;
   /** Ruta al audio que suena al abrir el modal. */
   audioUrl: string;
+  /**
+   * Segundo desde el que empieza a reproducirse el audio. Útil para saltar
+   * silencios o introducciones del MP3. Default: 0.
+   */
+  audioStartSec?: number;
   /** Título grande arriba del modal. */
   title: string;
   /** Subtítulo en cursiva debajo del título. */
@@ -30,6 +35,8 @@ export const STAR_CELEBRATIONS: Record<string, StarCelebration> = {
   "POR-15": {
     imageUrl: "/celebrations/siu.jpg",
     audioUrl: "/celebrations/siu.mp3",
+    // El primer segundo del MP3 es silencio/intro, arrancamos en 1.
+    audioStartSec: 1,
     title: "Cristiano Ronaldo",
     subtitle: "Su despedida mundialista",
     catchphrase: "SIUUUU!",
