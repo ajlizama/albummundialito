@@ -44,10 +44,33 @@ export default {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        "confetti-fall": {
+          "0%": { transform: "translateY(0) rotate(0deg)", opacity: "1" },
+          "85%": { opacity: "1" },
+          "100%": { transform: "translateY(110vh) rotate(720deg)", opacity: "0" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.55", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.04)" },
+        },
+        catchphrase: {
+          "0%": { transform: "scale(0.4) rotate(-3deg)", opacity: "0" },
+          "55%": { transform: "scale(1.18) rotate(2deg)", opacity: "1" },
+          "75%": { transform: "scale(0.96) rotate(-1deg)" },
+          "100%": { transform: "scale(1) rotate(0deg)", opacity: "1" },
+        },
+        "fade-up": {
+          "0%": { transform: "translateY(12px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
       },
       animation: {
         "pop-in": "pop-in 280ms cubic-bezier(0.34, 1.56, 0.64, 1)",
         shimmer: "shimmer 2.4s linear infinite",
+        "confetti-fall": "confetti-fall linear forwards",
+        "glow-pulse": "glow-pulse 2.4s ease-in-out infinite",
+        catchphrase: "catchphrase 900ms cubic-bezier(0.34, 1.56, 0.64, 1) both",
+        "fade-up": "fade-up 600ms ease-out 350ms both",
       },
     },
   },

@@ -8,8 +8,11 @@ import {
   decrementDuplicate,
 } from "@/app/actions/collection";
 import { PlayerInfoModal } from "./PlayerInfoModal";
-import { getStarVideo, type StarVideo } from "@/lib/data/star-videos";
-import { StarUnlockVideoModal } from "./StarUnlockVideoModal";
+import {
+  getStarCelebration,
+  type StarCelebration,
+} from "@/lib/data/star-celebrations";
+import { StarUnlockCelebrationModal } from "./StarUnlockCelebrationModal";
 
 interface Props {
   sticker: Sticker;
@@ -25,7 +28,7 @@ export function StickerTile({ sticker, count, teamColors, teamNameEs, flagCode }
   const [pending, startTransition] = useTransition();
   const [infoOpen, setInfoOpen] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
-  const [unlockedVideo, setUnlockedVideo] = useState<StarVideo | null>(null);
+  const [celebration, setCelebration] = useState<StarCelebration | null>(null);
 
   const hasWikiTarget = sticker.kind === "player" && Boolean(sticker.name);
   const photoUrl = `/stickers/${sticker.id}.jpg`;
@@ -37,13 +40,13 @@ export function StickerTile({ sticker, count, teamColors, teamNameEs, flagCode }
     const wasMissing = optimisticCount === 0;
     const next = optimisticCount === 0 ? 1 : optimisticCount - 1;
     setOptimistic(next);
-    // Si esta es una pegada nueva (0 → 1) y el sticker tiene video de
-    // estrella asociado, abrimos el modal. Lo hacemos en el render (no en
-    // el callback de la transición) para aprovechar que el click del usuario
-    // está fresco y los navegadores permiten autoplay con sonido.
+    // Si esta es una pegada nueva (0 → 1) y el sticker tiene celebración
+    // de estrella asociada, abrimos el modal. Lo hacemos sincrónicamente
+    // (no en el callback de la transición) para aprovechar que el click
+    // del usuario está fresco y los navegadores permiten autoplay con audio.
     if (wasMissing) {
-      const v = getStarVideo(sticker.id);
-      if (v) setUnlockedVideo(v);
+      const c = getStarCelebration(sticker.id);
+      if (c) setCelebration(c);
     }
     startTransition(async () => {
       try {
@@ -212,9 +215,9 @@ export function StickerTile({ sticker, count, teamColors, teamNameEs, flagCode }
         />
       )}
 
-      <StarUnlockVideoModal
-        video={unlockedVideo}
-        onClose={() => setUnlockedVideo(null)}
+      <StarUnlockCelebrationModal
+        celebration={celebration}
+        onClose={() => setCelebration(null)}
       />
     </div>
   );

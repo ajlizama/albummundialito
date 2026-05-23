@@ -3,8 +3,11 @@
 import { useState, useTransition } from "react";
 import { loadEnvelopes, type LoadEnvelopeResult, type DetectedSticker } from "@/app/actions/envelope";
 import { flagUrl } from "@/lib/data/stickers";
-import { getStarVideo, type StarVideo } from "@/lib/data/star-videos";
-import { StarUnlockVideoModal } from "./StarUnlockVideoModal";
+import {
+  getStarCelebration,
+  type StarCelebration,
+} from "@/lib/data/star-celebrations";
+import { StarUnlockCelebrationModal } from "./StarUnlockCelebrationModal";
 
 const MAX_DIM = 1600;
 const QUALITY = 0.85;
@@ -38,7 +41,7 @@ export function EnvelopeUploader() {
   const [result, setResult] = useState<LoadEnvelopeResult | null>(null);
   const [pending, startTransition] = useTransition();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [unlockedVideo, setUnlockedVideo] = useState<StarVideo | null>(null);
+  const [celebration, setCelebration] = useState<StarCelebration | null>(null);
 
   function updateCount(next: number) {
     const n = Math.max(1, Math.min(10, next));
@@ -90,15 +93,15 @@ export function EnvelopeUploader() {
         setResult(res);
 
         // Si alguno de los stickers recién pegados (status "new") es una
-        // estrella con video, mostramos el modal. Si hay varios, mostramos
-        // sólo el primero — el resto queda con su tarjeta normal.
+        // estrella con celebración, mostramos el modal. Si hay varios,
+        // mostramos sólo la primera — el resto queda con su tarjeta normal.
         if (res.ok) {
           const firstStar = res.sobres
             .flatMap((s) => s.detected)
             .filter((d) => d.status === "new" && d.stickerId)
-            .map((d) => getStarVideo(d.stickerId))
-            .find((v): v is StarVideo => v !== null);
-          if (firstStar) setUnlockedVideo(firstStar);
+            .map((d) => getStarCelebration(d.stickerId))
+            .find((c): c is StarCelebration => c !== null);
+          if (firstStar) setCelebration(firstStar);
         }
       } catch (err) {
         setErrorMsg(err instanceof Error ? err.message : "Error inesperado");
@@ -117,9 +120,9 @@ export function EnvelopeUploader() {
   // El modal de estrella se renderiza junto a cualquier rama del componente
   // (resumen o formulario) para que aparezca encima de lo que se esté viendo.
   const starModal = (
-    <StarUnlockVideoModal
-      video={unlockedVideo}
-      onClose={() => setUnlockedVideo(null)}
+    <StarUnlockCelebrationModal
+      celebration={celebration}
+      onClose={() => setCelebration(null)}
     />
   );
 
