@@ -51,8 +51,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <span>Sobre</span>
             </Link>
             <Link
-              href="/friends"
+              href="/fixture"
               className="px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-white/10 transition shrink-0"
+            >
+              Fixture
+            </Link>
+            <Link
+              href="/friends"
+              className="px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-white/10 transition shrink-0 hidden sm:inline"
             >
               Amigos
             </Link>
@@ -61,6 +67,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               className="px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-white/10 transition shrink-0"
             >
               Grupos
+            </Link>
+            <Link
+              href="/pollas"
+              className="px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-white/10 transition shrink-0"
+            >
+              Pollas
             </Link>
             <Link href="/trades" className="px-3 py-1.5 rounded-full hover:bg-white/10 transition hidden sm:inline">
               Intercambios
