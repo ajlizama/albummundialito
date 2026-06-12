@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { isPoolAdmin, loadPool, loadPoolLeaderboard } from "@/lib/pool/queries";
+import { isPoolAdmin, loadPool, loadPoolLeaderboard, loadMyPredictionsBulk } from "@/lib/pool/queries";
 import { PoolLeaderboardTable } from "@/components/PoolLeaderboardTable";
 import { PoolRulesDisplay } from "@/components/PoolRulesDisplay";
 import { fixtureForPool, SCOPE_LABEL } from "@/lib/pool/utils";
-import { maxPointsPerMatch } from "@/lib/pool/scoring";
+import { maxPointsPerMatch, scorePrediction } from "@/lib/pool/scoring";
+import { findTeam } from "@/lib/data/stickers";
+import type { MatchResult } from "@/lib/pool/types";
 
 export default async function PoolDetailPage({
   params,
@@ -19,19 +21,27 @@ export default async function PoolDetailPage({
   const pool = await loadPool(supabase, id);
   if (!pool) notFound();
 
-  const [leaderboard, amAdmin] = await Promise.all([
+  const [leaderboard, amAdmin, myPreds, resultsData] = await Promise.all([
     loadPoolLeaderboard(supabase, pool),
     isPoolAdmin(supabase, pool.id, user!.id),
+    loadMyPredictionsBulk(supabase, pool.id, user!.id),
+    supabase.from("match_results").select("*"),
   ]);
+  const results = new Map<number, MatchResult>(
+    ((resultsData.data as MatchResult[]) ?? []).map((r) => [r.match_num, r])
+  );
 
   const matches = fixtureForPool(pool);
   const maxPts = maxPointsPerMatch(pool);
 
-  // Próximos partidos del scope (limit 5)
+  // Particionar en pasados/próximos según kickoff
   const now = Date.now();
   const upcoming = matches
     .filter((m) => new Date(m.kickoffISO).getTime() > now)
     .slice(0, 5);
+  const past = matches
+    .filter((m) => new Date(m.kickoffISO).getTime() <= now)
+    .sort((a, b) => new Date(b.kickoffISO).getTime() - new Date(a.kickoffISO).getTime());
 
   const bonusesLocked = !!pool.bonuses_locked_at && new Date(pool.bonuses_locked_at) < new Date();
 
@@ -83,6 +93,66 @@ export default async function PoolDetailPage({
         <h2 className="font-mundial text-xl mb-3">Tabla de posiciones</h2>
         <PoolLeaderboardTable rows={leaderboard} currentUserId={user!.id} />
       </section>
+
+      {past.length > 0 && (
+        <section>
+          <h2 className="font-mundial text-xl mb-3">
+            Partidos jugados <span className="text-white/40 text-sm">({past.length})</span>
+          </h2>
+          <div className="card divide-y divide-white/5">
+            {past.map((m) => {
+              const result = results.get(m.num);
+              const home = m.homeCode ? findTeam(m.homeCode) : null;
+              const away = m.awayCode ? findTeam(m.awayCode) : null;
+              const homeLabel = home?.nameEs ?? m.homeLabel;
+              const awayLabel = away?.nameEs ?? m.awayLabel;
+              const myPred = myPreds.get(m.num);
+              const myPoints = myPred && result ? scorePrediction(pool, myPred, result, m).total : null;
+              return (
+                <Link
+                  key={m.num}
+                  href={`/pollas/${pool.id}/partido/${m.num}`}
+                  className="p-3 flex items-center justify-between gap-3 text-sm hover:bg-white/5 transition"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[10px] text-white/40">#{m.num} · {m.date} {m.timeChile}</div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {home?.flag && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={`https://flagcdn.com/w40/${home.flag}.png`} alt="" className="w-4 h-auto inline" />
+                      )}
+                      <span className="truncate">{homeLabel}</span>
+                      <span className="text-white/30">vs</span>
+                      {away?.flag && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={`https://flagcdn.com/w40/${away.flag}.png`} alt="" className="w-4 h-auto inline" />
+                      )}
+                      <span className="truncate">{awayLabel}</span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    {result ? (
+                      <div className="font-mono font-bold text-emerald-300">{result.home_goals}–{result.away_goals}</div>
+                    ) : (
+                      <div className="text-[10px] text-amber-300/70">en curso</div>
+                    )}
+                    {myPred && (
+                      <div className="text-[10px] text-white/50 mt-0.5">
+                        tu pick: <span className="font-mono">{myPred.home_goals}–{myPred.away_goals}</span>
+                        {myPoints != null && (
+                          <span className={`ml-1.5 font-bold ${myPoints > 0 ? "text-mundial-gold" : "text-white/40"}`}>
+                            +{myPoints}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {upcoming.length > 0 && (
         <section>
