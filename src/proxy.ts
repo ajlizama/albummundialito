@@ -1,7 +1,10 @@
 import { createServerClient, type CookieMethodsServer } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/auth", "/fixture.ics", "/fixture/team.ics"];
+// /api/* lo dejamos público para que el middleware no redirija a /login los
+// requests del cron de Vercel (que llegan sin cookies). Cada endpoint protege
+// lo suyo internamente (ej. /api/cron/sync-results valida CRON_SECRET).
+const PUBLIC_PATHS = ["/", "/login", "/signup", "/auth", "/api", "/fixture.ics", "/fixture/team.ics"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
