@@ -81,31 +81,25 @@ export async function GET(req: Request) {
   const shouldFetch = pending.length > 0 || minSinceLast >= FALLBACK_INTERVAL_MIN;
 
   if (!shouldFetch) {
-    const body = {
+    return NextResponse.json({
       ok: true,
-      action: "skipped" as const,
+      action: "skipped",
       reason: `sin partidos pendientes y último sync hace ${Math.round(minSinceLast)} min`,
       pendingCount: 0,
-    };
-    console.log("[cron]", JSON.stringify(body));
-    return NextResponse.json(body);
+    });
   }
 
   // Llamada real a football-data.org
-  console.log("[cron] calling football-data.org. pending:", pending.length, "minSinceLast:", minSinceLast);
   const { results, skipped } = await fetchWorldCupResults();
-  console.log("[cron] API returned. results:", results.length, "skipped:", skipped.slice(0, 5));
   if (results.length === 0) {
-    const body = {
+    return NextResponse.json({
       ok: true,
-      action: "fetched" as const,
+      action: "fetched",
       fetched: 0,
       applied: 0,
       pendingCount: pending.length,
       skipped,
-    };
-    console.log("[cron]", JSON.stringify(body));
-    return NextResponse.json(body);
+    });
   }
 
   const toUpsert = results
@@ -140,16 +134,14 @@ export async function GET(req: Request) {
     applied = count ?? toUpsert.length;
   }
 
-  const body = {
+  return NextResponse.json({
     ok: true,
-    action: "fetched" as const,
+    action: "fetched",
     fetched: results.length,
     applied,
     overridden: results.length - toUpsert.length,
     pendingCount: pending.length,
     pendingMatches: pending,
-    skipped: skipped.slice(0, 10),
-  };
-  console.log("[cron]", JSON.stringify(body));
-  return NextResponse.json(body);
+    skipped,
+  });
 }
