@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { FIXTURE, STAGE_LABEL, type FixtureMatch } from "@/lib/data/fixture";
 import { findTeam } from "@/lib/data/stickers";
 import { saveBulkPredictions } from "@/app/actions/pool";
@@ -56,10 +57,12 @@ export function MatchPredictionGrid({ poolId, matches, myPredictions, results, c
             {ms.map((m) => (
               <MatchRow
                 key={m.num}
+                poolId={poolId}
                 match={m}
                 prediction={myPredictions.get(m.num)}
                 result={results.get(m.num)}
                 locked={!isMatchOpen(m, cutoffMinutes, now)}
+                started={new Date(m.kickoffISO) <= now}
               />
             ))}
           </div>
@@ -79,12 +82,14 @@ export function MatchPredictionGrid({ poolId, matches, myPredictions, results, c
 }
 
 function MatchRow({
-  match, prediction, result, locked,
+  poolId, match, prediction, result, locked, started,
 }: {
+  poolId: string;
   match: FixtureMatch;
   prediction: PoolPrediction | undefined;
   result: MatchResult | undefined;
   locked: boolean;
+  started: boolean;
 }) {
   const home = match.homeCode ? findTeam(match.homeCode) : null;
   const away = match.awayCode ? findTeam(match.awayCode) : null;
@@ -144,6 +149,16 @@ function MatchRow({
           <span className="text-amber-300/70">cerrado</span>
         ) : (
           <span className="text-white/30">abierto</span>
+        )}
+        {started && (
+          <div>
+            <Link
+              href={`/pollas/${poolId}/partido/${match.num}`}
+              className="text-mundial-gold hover:underline"
+            >
+              ver pronósticos →
+            </Link>
+          </div>
         )}
       </div>
     </div>

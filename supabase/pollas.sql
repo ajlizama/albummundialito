@@ -149,6 +149,23 @@ alter table public.tournament_results enable row level security;
 
 
 -- ============================================================================
+-- 7) match_schedule
+--    Tabla con los kickoffs de los 104 partidos. Permite que las RLS sepan
+--    si un partido ya arrancó (para mostrar pronósticos ajenos solo después).
+--    Se popula vía pollas_hotfix_005.sql (con los 104 inserts del fixture).
+-- ============================================================================
+create table if not exists public.match_schedule (
+  match_num int primary key check (match_num between 1 and 104),
+  kickoff_at timestamptz not null
+);
+
+alter table public.match_schedule enable row level security;
+
+drop policy if exists "ms_select_all" on public.match_schedule;
+create policy "ms_select_all" on public.match_schedule for select using (true);
+
+
+-- ============================================================================
 -- HELPERS SECURITY DEFINER (evitan recursión en RLS de pool_members)
 -- ============================================================================
 create or replace function public.is_pool_member(p_pool uuid, p_user uuid)
@@ -169,6 +186,19 @@ $$;
 
 grant execute on function public.is_pool_member(uuid, uuid) to authenticated;
 grant execute on function public.is_pool_admin_of(uuid, uuid) to authenticated;
+
+-- ¿Este partido ya arrancó? (usado por la RLS de pool_predictions)
+create or replace function public.match_has_started(p_match_num int)
+returns boolean
+language sql security definer set search_path = public stable
+as $$
+  select coalesce(
+    (select now() >= kickoff_at from public.match_schedule where match_num = p_match_num),
+    false
+  );
+$$;
+
+grant execute on function public.match_has_started(int) to authenticated;
 
 
 -- ============================================================================
@@ -219,10 +249,14 @@ create policy "pm_delete_self_or_admin" on public.pool_members
     or public.is_pool_admin_of(pool_id, auth.uid())
   );
 
--- pool_predictions
+-- pool_predictions: ves tus propios pronósticos siempre, y los ajenos solo
+-- después de que el partido arrancó (para no copiar a tus amigos).
 drop policy if exists "pp_select_members" on public.pool_predictions;
 create policy "pp_select_members" on public.pool_predictions
-  for select using (public.is_pool_member(pool_id, auth.uid()));
+  for select using (
+    public.is_pool_member(pool_id, auth.uid())
+    and (user_id = auth.uid() or public.match_has_started(match_num))
+  );
 
 drop policy if exists "pp_modify_own" on public.pool_predictions;
 create policy "pp_modify_own" on public.pool_predictions
